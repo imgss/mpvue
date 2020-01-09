@@ -136,15 +136,20 @@ function getPage (vm) {
 
 // 优化js变量动态变化时候引起全量更新
 // 优化每次 setData 都传递大量新数据
-export function updateDataToMP () {
-  const page = getPage(this)
+export function updateDataToMP (flag) {
+  var page = getPage(this);
   if (!page) {
     return
   }
 
-  const data = {}
-  diffData(this, data)
-  throttleSetData(page.setData.bind(page), data)
+  var data = formatVmData(this);
+  diffData(this, data);
+  // 对需要立即更新数据的场景，如onHide可立即更新数据
+  if (flag) {
+    page.setData(data);
+  } else {
+    throttleSetData(page.setData.bind(page), data);
+  }
 }
 
 export function initDataToMP () {
